@@ -71,10 +71,6 @@ SteamAudioPlayer::SteamAudioPlayer() {
 	is_local_state_init.store(false);
 	can_load_local_state.store(true);
 
-	if (Engine::get_singleton()->is_editor_hint()) {
-		return;
-	}
-
 	auto str = dynamic_cast<SteamAudioStream *>(get_stream().ptr());
 	if (str == nullptr) {
 		Ref<SteamAudioStream> new_stream;
@@ -205,10 +201,6 @@ void SteamAudioPlayer::ready_internal() {
 		set_attenuation_model(ATTENUATION_DISABLED);
 	}
 
-	if (Engine::get_singleton()->is_editor_hint()) {
-		return;
-	}
-
 	auto str = dynamic_cast<SteamAudioStream *>(get_stream().ptr());
 	if (str == nullptr) {
 		if (is_autoplay_enabled()) {
@@ -225,6 +217,10 @@ void SteamAudioPlayer::ready_internal() {
 		if (is_autoplay_enabled()) {
 			play();
 		}
+	}
+
+	if (Engine::get_singleton()->is_editor_hint()) {
+		return;
 	}
 
 	if (cfg.ambisonics_order > SteamAudioConfig::max_ambisonics_order) {
