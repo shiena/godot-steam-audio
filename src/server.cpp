@@ -275,6 +275,20 @@ void SteamAudioServer::add_listener(SteamAudioListener *lis) {
 
 void SteamAudioServer::add_local_state(LocalSteamAudioState *ls) {
 	self->local_states.push_back(ls);
+
+	int refl_count = 0;
+	for (auto s : self->local_states) {
+		if (s->cfg.is_reflection_on) {
+			refl_count++;
+		}
+	}
+	if (refl_count > SteamAudioConfig::max_num_refl_srcs) {
+		UtilityFunctions::push_warning(
+				"Number of reflection-enabled SteamAudioPlayers (", refl_count,
+				") exceeds max_reflection_sources (", SteamAudioConfig::max_num_refl_srcs,
+				"). Some sources may not have reflections simulated. "
+				"Increase max_reflection_sources in SteamAudioConfig if needed.");
+	}
 }
 
 void SteamAudioServer::remove_local_state(LocalSteamAudioState *ls) {

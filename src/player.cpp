@@ -137,7 +137,11 @@ void SteamAudioPlayer::init_local_state() {
 	local_state.cfg = cfg;
 
 	IPLSourceSettings src_cfg{};
-	src_cfg.flags = static_cast<IPLSimulationFlags>(IPL_SIMULATIONFLAGS_DIRECT | IPL_SIMULATIONFLAGS_REFLECTIONS);
+	if (cfg.is_reflection_on) {
+		src_cfg.flags = static_cast<IPLSimulationFlags>(IPL_SIMULATIONFLAGS_DIRECT | IPL_SIMULATIONFLAGS_REFLECTIONS);
+	} else {
+		src_cfg.flags = IPL_SIMULATIONFLAGS_DIRECT;
+	}
 	handleErr(iplSourceCreate(gs->sim, &src_cfg, &local_state.src.src));
 	iplSourceAdd(local_state.src.src, gs->sim);
 	iplSimulatorCommit(gs->sim);
