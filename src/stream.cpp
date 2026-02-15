@@ -42,6 +42,12 @@ int32_t SteamAudioStreamPlayback::_mix(AudioFrame *buffer, float rate_scale, int
 	}
 
 	if (Engine::get_singleton()->is_editor_hint()) {
+		PackedVector2Array mixed = stream_playback->mix_audio(rate_scale, frames);
+		frames = int(mixed.size());
+		for (int i = 0; i < frames; i++) {
+			buffer[i].left = mixed[i].x;
+			buffer[i].right = mixed[i].y;
+		}
 		return frames;
 	}
 
@@ -160,10 +166,6 @@ void SteamAudioStreamPlayback::_bind_methods() {
 }
 
 int SteamAudioStreamPlayback::play_stream(const Ref<AudioStream> &p_stream, float p_from_offset, float p_volume_db, float p_pitch_scale) {
-	if (Engine::get_singleton()->is_editor_hint()) {
-		return 0;
-	}
-
 	stream = p_stream;
 	stream_playback = stream->instantiate_playback();
 	stream_playback->start(p_from_offset);
