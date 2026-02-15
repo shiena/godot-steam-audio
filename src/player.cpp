@@ -247,6 +247,24 @@ void SteamAudioPlayer::process_internal(double delta) {
 		set_attenuation_model(ATTENUATION_DISABLED);
 	}
 
+	if (get_stream().ptr() != nullptr) {
+		auto str = dynamic_cast<SteamAudioStream *>(get_stream().ptr());
+		if (str == nullptr) {
+			bool was_playing = is_playing();
+			if (was_playing) {
+				stop();
+			}
+			Ref<SteamAudioStream> new_stream;
+			new_stream.instantiate();
+			new_stream->set_stream(get_stream());
+			new_stream->parent = this;
+			set_stream(new_stream);
+			if (was_playing) {
+				play();
+			}
+		}
+	}
+
 	if (is_playing() && !get_stream_playback().is_null()) {
 		pb = get_stream_playback();
 	}
