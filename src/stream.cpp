@@ -112,6 +112,8 @@ int32_t SteamAudioStreamPlayback::_mix(AudioFrame *buffer, float rate_scale, int
 		iplAudioBufferMix(gs->ctx, &ls->bufs.in, &ls->bufs.direct);
 	}
 
+	std::lock_guard<std::mutex> hrtf_guard(gs->hrtf_lock);
+
 	IPLAmbisonicsDecodeEffectParams dec_params{};
 	dec_params.orientation = gs->listener_coords;
 	dec_params.order = ls->cfg.ambisonics_order;

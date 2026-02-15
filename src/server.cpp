@@ -1,4 +1,5 @@
 #include "server.hpp"
+#include "config.hpp"
 #include "godot_cpp/classes/engine.hpp"
 #include "godot_cpp/classes/project_settings.hpp"
 #include "godot_cpp/core/class_db.hpp"
@@ -23,6 +24,11 @@ void SteamAudioServer::tick() {
 	}
 
 	SteamAudio::log(SteamAudio::log_debug, "tick");
+
+	if (SteamAudioConfig::hrtf_volume_dirty.load()) {
+		SteamAudioConfig::hrtf_volume_dirty.store(false);
+		recreate_hrtf();
+	}
 
 	if (!is_refl_thread_processing.load()) {
 		iplSceneCommit(self->global_state.scene);
@@ -314,6 +320,23 @@ void SteamAudioServer::remove_dynamic_mesh(IPLInstancedMesh mesh) {
 	}
 
 	iplInstancedMeshRemove(mesh, global_state.scene);
+}
+
+void SteamAudioServer::recreate_hrtf() {
+	SteamAudio::log(SteamAudio::log_info, "Recreating HRTF with new volume");
+
+	std::lock_guard<std::mutex> hrtf_guard(global_state.hrtf_lock);
+	std::lock_guard<std::mutex> refl_guard(global_state.refl_ir_lock);
+
+	IPLHRTF old_hrtf = global_state.hrtf;
+	global_state.hrtf = create_hrtf(global_state.ctx, global_state.audio_cfg);
+
+	// Recreate the global ambisonics decode effect with the new HRTF
+	iplAmbisonicsDecodeEffectRelease(&global_state.ambi_dec_effect);
+	global_state.ambi_dec_effect = create_ambisonics_decode_effect(
+			global_state.ctx, global_state.audio_cfg, global_state.hrtf);
+
+	iplHRTFRelease(&old_hrtf);
 }
 
 SteamAudioServer::SteamAudioServer() {

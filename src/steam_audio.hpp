@@ -35,6 +35,7 @@ struct GlobalSteamAudioState {
 	IPLSimulator sim;
 	IPLCoordinateSpace3 listener_coords;
 	std::mutex refl_ir_lock;
+	std::mutex hrtf_lock;
 };
 
 struct SteamAudioSource {

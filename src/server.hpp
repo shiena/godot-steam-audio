@@ -58,6 +58,7 @@ public:
 	void remove_dynamic_mesh(IPLInstancedMesh mesh);
 
 	void tick();
+	void recreate_hrtf();
 };
 
 #endif // STEAM_AUDIO_SERVER_H

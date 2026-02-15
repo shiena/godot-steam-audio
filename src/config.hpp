@@ -5,6 +5,7 @@
 #include "godot_cpp/classes/wrapped.hpp"
 #include "phonon.h"
 #include "steam_audio.hpp"
+#include <atomic>
 
 using namespace godot;
 
@@ -34,6 +35,7 @@ public:
 	static int max_num_refl_srcs;
 	static int num_refl_threads;
 	static IPLSceneType scene_type;
+	static std::atomic<bool> hrtf_volume_dirty;
 
 	SteamAudioConfig();
 	~SteamAudioConfig();

@@ -14,6 +14,7 @@ float SteamAudioConfig::max_refl_duration = 2.0f;
 int SteamAudioConfig::max_num_refl_srcs = 8;
 int SteamAudioConfig::num_refl_threads = 2;
 IPLSceneType SteamAudioConfig::scene_type = IPL_SCENETYPE_EMBREE; // TODO: support more types
+std::atomic<bool> SteamAudioConfig::hrtf_volume_dirty{false};
 
 void SteamAudioConfig::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_global_log_level"), &SteamAudioConfig::get_global_log_level);
@@ -94,7 +95,10 @@ SteamAudio::GodotSteamAudioLogLevel SteamAudioConfig::get_global_log_level() { r
 void SteamAudioConfig::set_global_log_level(SteamAudio::GodotSteamAudioLogLevel p_global_log_level) { log_level = p_global_log_level; }
 
 float SteamAudioConfig::get_hrtf_volume() { return hrtf_volume; }
-void SteamAudioConfig::set_hrtf_volume(float p_hrtf_volume) { hrtf_volume = p_hrtf_volume; }
+void SteamAudioConfig::set_hrtf_volume(float p_hrtf_volume) {
+	hrtf_volume = p_hrtf_volume;
+	hrtf_volume_dirty.store(true);
+}
 
 int SteamAudioConfig::get_max_ambisonics_order() { return max_ambisonics_order; }
 void SteamAudioConfig::set_max_ambisonics_order(int p_max_ambisonics_order) { max_ambisonics_order = p_max_ambisonics_order; }
